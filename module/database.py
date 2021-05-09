@@ -75,6 +75,21 @@ class Database:
         except:
             return False
 
+    def create(self, povolani):
+        try:
+            self.session.add(povolani)
+            self.session.commit()
+            return True
+        except:
+            return False
+
+    def read_all(self, order=Povolani.nazev_povolani):
+        try:
+            result = self.session.query(Povolani).order_by(order).all()
+            return result
+        except:
+            return False
+
     def read_popis(self, order=Popis.popis):
         try:
             result = self.session.query(Popis).order_by(order).all()
@@ -117,6 +132,13 @@ class Database:
         except:
             return False
 
+    def read_by_id(self, id):
+        try:
+            result = self.session.query(Povolani).get(id)
+            return result
+        except:
+            return False
+
     def update(self):
         try:
             self.session.commit()
@@ -146,6 +168,15 @@ class Database:
         try:
             pokus = self.read_popis_by_id(id)
             self.session.delete(pokus)
+            self.session.commit()
+            return True
+        except:
+            return False
+
+    def delete(self, id):
+        try:
+            povolani = self.read_by_id(id)
+            self.session.delete(povolani)
             self.session.commit()
             return True
         except:

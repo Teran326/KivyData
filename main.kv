@@ -1,0 +1,28 @@
+<PovolaniContent>:
+    orientation: 'vertical'
+    size_hint_x: 1
+    size_hint_y: None
+    height: "100dp"
+
+    MDTextField:
+        id: povolani_name
+        text: 'jméno povolání'
+        pos_hint: {'center_x': .5, 'center_y': .9}
+
+    MDDropDownItem:
+        id: rasa_item
+        pos_hint: {'center_x': .5, 'center_y': .7}
+        size_hint_x: 1
+        text: 'Rasa'
+        on_release: self.parent.menu_rasa.open()
+
+<RasaContent>:
+    orientation: 'vertical'
+    size_hint_x: 1
+    size_hint_y: None
+    height: "100dp"
+
+    MDTextField:
+        id: rasa
+        text: 'Název rasy'
+        pos_hint: {'center_x': .5, 'center_y': .7}
