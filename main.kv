@@ -1,3 +1,21 @@
+BoxLayout:
+    orientation:'vertical'
+
+    MDToolbar:
+        title: 'Osobní databáze'
+        md_bg_color: .8, .2, .2, 1
+        specific_text_color: 1, 1, 1, 1
+
+    MDBottomNavigation:
+        id: navigation
+        panel_color: .8, .8, .4, 1
+
+        MDBottomNavigationItem:
+            name: 'screen 1'
+            text: 'Osobní databáze'
+            icon: 'card-bulleted'
+
+
 <PovolaniContent>:
     orientation: 'vertical'
     size_hint_x: 1
@@ -14,7 +32,7 @@
         pos_hint: {'center_x': .5, 'center_y': .7}
         size_hint_x: 1
         text: 'Rasa'
-        on_release: self.parent.menu_rasa.open()
+        on_release: self.parent.menu_rasy.open()
 
 <RasaContent>:
     orientation: 'vertical'
@@ -23,6 +41,17 @@
     height: "100dp"
 
     MDTextField:
-        id: rasa
+        id: rasa_name
         text: 'Název rasy'
+        pos_hint: {'center_x': .5, 'center_y': .7}
+
+<PopisContent>:
+    orientation: 'vertical'
+    size_hint_x: 1
+    size_hint_y: None
+    height: "100dp"
+
+    MDTextField:
+        id: popis_text
+        text: 'Popis povolání'
         pos_hint: {'center_x': .5, 'center_y': .7}

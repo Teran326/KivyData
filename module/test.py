@@ -4,6 +4,7 @@ from kivy.uix.scrollview import ScrollView
 from kivymd.uix.button import MDFlatButton, MDFillRoundFlatIconButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import MDList, TwoLineAvatarIconListItem
+from kivymd.uix.menu import MDDropdownMenu
 from module.database import *
 
 
@@ -27,8 +28,8 @@ class RasaDialog(MDDialog):
 
     def save_dialog(self, *args):
         rasa = Rasa()
-        rasa.full_name = self.content_cls.ids.rasa.text
-        app.test.database.create_rasa(rasa)
+        rasa.nazev_rasy = self.content_cls.ids.rasa.text
+        app.povolani.database.create_rasa(rasa)
         self.dismiss()
 
     def cancel_dialog(self, *args):
@@ -38,6 +39,29 @@ class RasaDialog(MDDialog):
 class PovolaniContent(BoxLayout):
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)
+        if id:
+            povolani = vars(app.povolani.database.read_by_id(id))
+        else:
+            povolani = {"id": "", "nazev_povolani": "Název povolani", "popis_id": "popis", "rasa_id": "rasa"}
+
+        self.ids.nazev_povolani.text = povolani['nazev_povolani']
+        rasy = app.povolani.database.read_rasa()
+
+        menu_items_rasy = [{"viewclass": "OneLineListItem", "text": f"{rasa.nazev_rasy}",
+                               "on_release": lambda x=f"{rasa.nazev_rasy}": self.set_item(x)} for rasa in rasy]
+        self.menu_rasy = MDDropdownMenu(
+            caller=self.ids.rasa_item,
+            items=menu_items_rasy,
+            position="center",
+            width_mult=5,
+        )
+        self.ids.rasa_item.set_item(povolani['rasa_id'])
+        self.ids.rasa_item.text = povolani['rasa_id']
+
+        def set_item(self, text_item):
+            self.ids.rasa_item.set_item(text_item)
+            self.ids.rasa_item.text = text_item
+            self.menu_rasy.dismiss()
 
 
 class PovolaniDialog(MDDialog):
@@ -54,9 +78,12 @@ class PovolaniDialog(MDDialog):
         )
 
     def save_dialog(self, *args):
-        povolani = Povolani()
-        povolani.full_name = self.content_cls.ids.povolani.text
-        app.test.database.create_povolani(povolani)
+        povolani = {'nazev_povolani': self.content_cls.ids.nazev_povolani.text, 'rasa_id': self.content_cls.ids.rasa_item.text}
+        if self.id:
+            povolani["id"] = self.id
+            app.books.update(povolani)
+        else:
+            app.books.create(povolani)
         self.dismiss()
 
     def cancel_dialog(self, *args):
@@ -73,7 +100,7 @@ class PopisDialog(MDDialog):
         super(PopisDialog, self).__init__(
             type="custom",
             content_cls=PopisContent(),
-            title='Nové povolání',
+            title='Popis povolání',
             size_hint=(.8, 1),
             buttons=[
                 MDFlatButton(text='Uložit', on_release=self.save_dialog),
@@ -152,25 +179,25 @@ class Povolani(BoxLayout):
         button_box.add_widget(new_povolani_btn)
         # Přidání tlačítka pro vložení nového státu
         new_rasa_btn = MDFillRoundFlatIconButton()
-        new_rasa_btn.text = "Nový stát"
+        new_rasa_btn.text = "Nová rasa"
         new_rasa_btn.icon = "plus"
         new_rasa_btn.icon_color = [0.9, 0.9, 0.9, 1]
         new_rasa_btn.text_color = [0.9, 0.9, 0.9, 1]
         new_rasa_btn.md_bg_color = [0.8, 0.5, 0, 1]
         new_rasa_btn.font_style = "Button"
         new_rasa_btn.pos_hint = {"center_x": .6}
-        new_rasa_btn.on_release = self.on_create_state
+        new_rasa_btn.on_release = self.on_create_rasa
         button_box.add_widget(new_rasa_btn)
 
         new_popis_btn = MDFillRoundFlatIconButton()
-        new_popis_btn.text = "Nový stát"
+        new_popis_btn.text = "Nový popis"
         new_popis_btn.icon = "plus"
         new_popis_btn.icon_color = [0.9, 0.9, 0.9, 1]
         new_popis_btn.text_color = [0.9, 0.9, 0.9, 1]
         new_popis_btn.md_bg_color = [0.8, 0.5, 0, 1]
         new_popis_btn.font_style = "Button"
         new_popis_btn.pos_hint = {"center_x": .6}
-        new_popis_btn.on_release = self.on_create_state
+        new_popis_btn.on_release = self.on_create_popis
         button_box.add_widget(new_popis_btn)
         self.add_widget(button_box)
 
@@ -195,11 +222,18 @@ class Povolani(BoxLayout):
         self.dialog = PovolaniDialog(id=None)
         self.dialog.open()
 
-    def on_create_state(self, *args):
+    def on_create_rasa(self, *args):
         """
         Metoda reaguje na tlačítko Nový stát a vyvolá dialogové okno StateDialog
         """
         self.dialog = RasaDialog()
+        self.dialog.open()
+
+    def on_create_popis(self, *args):
+        """
+        Metoda reaguje na tlačítko Nový stát a vyvolá dialogové okno StateDialog
+        """
+        self.dialog = PopisDialog()
         self.dialog.open()
 
     def create(self, povolani):

@@ -38,7 +38,7 @@ class Database:
         MYSQL: 'mysql+mysqlconnector://{USERNAME}:{PASSWORD}@localhost/{DB}'
     }
 
-    def __init__(self, dbtype='sqlite', username='', password='', dbname='data.db'):
+    def __init__(self, dbtype='sqlite', username='', password='', dbname='data'):
         dbtype = dbtype.lower()
 
         if dbtype in self.DB_ENGINE.keys():
